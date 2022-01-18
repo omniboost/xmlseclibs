@@ -293,7 +293,13 @@ class XMLSecurityDSig
             }
         }
 
-        return $node->C14N($exclusive, $withComments, $arXPath, $prefixList);
+        $canonicalData = $node->C14N($exclusive, $withComments, $arXPath, $prefixList);
+
+        // Do the same as .Net C14N
+        $sxml = simplexml_load_string($canonicalData, 'SimpleXMLElement', LIBXML_NOBLANKS);
+        $canonicalData = dom_import_simplexml($sxml)->ownerDocument->saveHTML();
+        $canonicalData = str_replace(array("\n", "\r"), '', $canonicalData);
+        return $canonicalData;
     }
 
     /**
